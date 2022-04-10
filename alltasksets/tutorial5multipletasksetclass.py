@@ -2,7 +2,6 @@ from locust import TaskSet, task, constant, HttpUser
 
 
 class MyTaskSet1(TaskSet):
-
     @task
     def first_api(self):
         self.client.get('/api/users/2')
@@ -11,7 +10,6 @@ class MyTaskSet1(TaskSet):
 
 
 class MyTaskSet2(TaskSet):
-
     @task
     def second_api(self):
         self.client.get('/api/users?page=2')
