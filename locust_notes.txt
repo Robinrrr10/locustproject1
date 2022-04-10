@@ -248,6 +248,80 @@ locust -f alltasksets\myenpoints.py
 Then give in UI
 
 
+-----------
+
+Tutorial 5:TaskSet class Part 2
+--------------------------------
+Two way we can have multiple taskSet class.
+1. Nested taskset class
+2. 2 seperate class for taskset
+
+Nested taskset class:
+We can have nested taskset class. (taskset class inside another taskset class)
+to come out of the inner nested taskset class we need to use self.interrupt(). Else it will loop into same class
+To give breathing time use self.interrupt(reschedule = False). So that it will give breathing time. By default reschedule will be True. so we are changing to False
+
+Eg:
+from locust import TaskSet, task, constant, HttpUser
+
+class MyTaskSet1(TaskSet):
+
+    @task
+    def first_api(self):
+        res = self.client.get('/api/users/2')
+        print('First api')
+
+    @task
+    class MyTaskSetNested(TaskSet):
+
+        @task
+        def second_api(self):
+            res = self.client.get('/api/users?page=2')
+            print('Second api')
+            self.interrupt(reschedule = False)
+
+class MyHttp(HttpUser):
+    host = "https://reqres.in"
+    tasks = [MyTaskSet1]
+    wait_time = constant(1)
+
+
+
+
+2 seperate class for taskset:
+We can add all taskset class in tasks of user / httpuser class
+tasks = [Mytaskset1, mytaskset2]
+also use self.interrupt(), else it will loop into same class
+To give breathing time use self.interrupt(reschedule = False) in both task method of both class. So that it will give breathing time. By default reschedule will be True. so we are changing to False.
+
+Eg:
+from locust import TaskSet, task, constant, HttpUser
+
+
+class MyTaskSet1(TaskSet):
+
+    @task
+    def first_api(self):
+        self.client.get('/api/users/2')
+        print('First api')
+        self.interrupt(reschedule=False)
+
+
+class MyTaskSet2(TaskSet):
+
+    @task
+    def second_api(self):
+        self.client.get('/api/users?page=2')
+        print('Second api')
+        self.interrupt(reschedule=False)
+
+
+class MyHttpUser(HttpUser):
+    host = "https://reqres.in"
+    tasks = [MyTaskSet1, MyTaskSet2]
+    wait_time = constant(1)
+
+
 -------------
 
 To run in UI:
