@@ -210,6 +210,46 @@ In example 2, i have not used host. So i will past host when running. Eg: locust
 
 ----------
 
+Tutorial 4: Learn locust series: TaskSet class Part 1
+------------------------------------------------------
+
+TaskSet will have many tasks.
+We should have User or HttpUser and add all TaskSet in task, then only it will work.
+
+Eg:   //file name is myendpoints.py  . It is under alltasksets
+
+from locust import TaskSet, constant, task, HttpUser
+import random
+
+class MyApisTask(TaskSet):
+
+    @task
+    def get_page_api(self):
+        self.client.get('/api/users?page=2')
+        print('Get api page 2')
+
+    @task
+    def get_differnt_id_api(self):
+        ids = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
+        random_endpoint = "/api/users/" + str(random.choice(ids))
+        self.client.get(random_endpoint)
+        print('Each api with id')
+
+class MyUser(HttpUser):
+    host = "https://reqres.in"
+    tasks = [MyApisTask]                          //We can have multiple taskset
+    wait_time = constant(1)
+
+
+
+To run give below command:
+locust -f alltasksets\myenpoints.py
+
+Then give in UI
+
+
+-------------
+
 To run in UI:
 -------
 --------
