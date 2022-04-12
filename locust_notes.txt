@@ -516,6 +516,119 @@ locust -f tutorial9commandsWithLogsAndHtmletc.py --show-task-ratio-json
 
 locust -f tutorial9commandsWithLogsAndHtmletc.py -u 2 -r 3 -t 20s --headless --print-stats --host=https://reqres.in -L DEBUG --logfile test.log --html uireport.html
 
+-------------
+
+Tutorial 10: on start and on stop method:
+---------------------------------------
+
+on_start and on_stop methods are available in User class, HttpUser class, TaskSet class and SequencialTaskSet class
+on_start will be called when starting the class. We can use for preparing test data or login etc
+on_stop will be called when stopping the class. we can use this for cleaning test data or loggout etc
+
+
+If on_start and on_stop is available in User/HttpUser and TaskSet/SequencialTaskSet.
+It  will execute on_start of User/HttpUser, then on_start of TaskSet/SequenctialTaskSet, then on_stop of TaskSet/SequenctialTaskSet, then on_stop of User/HttpUser.
+
+Example 1:
+from locust import User, task, constant
+
+
+class MyUser(User):
+    wait_time = constant(1)
+
+    def on_start(self):
+        print('Start')
+
+    @task
+    def my_task1(self):
+        print('task 1')
+
+    @task
+    def my_task2(self):
+        print('task 2')
+
+    def on_stop(self):
+        print('Stop')
+
+
+Example 2:
+from locust import SequentialTaskSet, HttpUser, task, constant
+
+
+class MyTaskPages(SequentialTaskSet):
+
+    def on_start(self):
+        print('Start seq')
+
+    @task
+    def my_page2(self):
+        res = self.client.get('/api/users?page=2')
+        print('Called the page 2. response is:', res.status_code)
+
+    @task
+    def my_page3(self):
+        res = self.client.get('/api/users?page=3')
+        print('Called the page 3. response is:', res.status_code)
+
+    def on_stop(self):
+        print('Stop seq')
+
+
+class MyHttpUser(HttpUser):
+
+    host = "https://reqres.in"
+    wait_time = constant(1)
+    tasks = [MyTaskPages]
+
+    def on_start(self):
+        print('Start httpuser')
+
+    def on_stop(self):
+        print('Stop httpuser')
+
+
+
+Example 3:
+
+from locust import TaskSet, HttpUser, task, constant
+
+
+class MyTaskPages(TaskSet):
+
+    def on_start(self):
+        print('Start seq')
+
+    @task
+    def my_page2(self):
+        res = self.client.get('/api/users?page=2')
+        print('Called the page 2. response is:', res.status_code)
+
+    @task
+    def my_page3(self):
+        res = self.client.get('/api/users?page=3')
+        print('Called the page 3. response is:', res.status_code)
+
+    def on_stop(self):
+        print('Stop seq')
+
+
+class MyHttpUser(HttpUser):
+
+    host = "https://reqres.in"
+    wait_time = constant(1)
+    tasks = [MyTaskPages]
+
+    def on_start(self):
+        print('Start httpuser')
+
+    def on_stop(self):
+        print('Stop httpuser')
+
+
+----
+
+
+
 
 -------------
 
