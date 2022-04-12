@@ -355,6 +355,78 @@ class MyHttpUser(HttpUser):
     wait_time = constant(1)
 
 
+----------
+
+Tutorial 7: Wait time function
+-------------------------------
+
+Three 3 types of wait time we can give
+Eg:
+wait_time = constant(2)   //Constant wait time . In this example it will wait 2 sec after each task
+wait_time = between(5, 10)  //This will take random time between given two values. In this example, it will take wait time randomly between 5 sec to 10 for each task
+wait_time = constant_pacing(3) //This is minimum time a task should take. In this example we have given 3 sec, so it will take minimum 3 sec for each task. Does not matter how fast it is. still it will for 3 sec. Does not worry about if task takes more than 3 sec. Just will say take minimum 3 sec for an task. thats it
+
+
+
+Example for constant:
+
+from locust import User, constant, task
+
+class MyUser(User):
+
+    wait_time = constant(5)        //Wait for 5 sec in every task
+
+    @task
+    def my_task(self):
+        print('My task. It will wait for 2 sec as constant is 2 sec')
+
+
+
+Example for between:
+
+from locust import task, User, between
+
+
+class MyUser(User):
+    wait_time = between(2, 5)
+
+    @task
+    def my_task(self):
+        print('This task will randomly wait between 2 to 5 sec')
+
+
+
+Example for constant_pacing:
+
+from locust import User, task, constant_pacing
+import time
+
+
+class MyUser(User):
+
+    wait_time = constant_pacing(5)
+
+    @task
+    def my_task(self):
+        time.sleep(2)         //Here sleep is 2, so it will wait for 2 sec, As constant pacing is 5, it will wait 3 more sec to achive 5 sec (2+3 = 5) //Minimum it should wait for 5 sec
+        print('My task. It will wait for 5 sec') 
+
+
+constant_pacing Example with  more wait inside task it self:
+
+from locust import User, task, constant_pacing
+import time
+
+
+class MyUser(User):
+
+    wait_time = constant_pacing(5)
+
+    @task
+    def my_task(self):
+        time.sleep(10) //It will wait for 10 sec. Miniumum it should wait for 5 as per constant_parsing. So it will wait for 10 sec sleep and go further
+        print('My task. It will wait for 10 sec')
+
 
 
 -------------
