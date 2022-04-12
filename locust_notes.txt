@@ -428,6 +428,48 @@ class MyUser(User):
         print('My task. It will wait for 10 sec')
 
 
+------------
+
+Tutorial 8: Command line option part 1:
+--------------------------------------
+locust -h    //This will give all available commands in locust
+
+Sample commnad to run load test and geting the result
+locust -f script.py -u 10 -r 2 -t 10s --headless --print-stats --csv result.csv --csv-full-history --host=http://hostname.com
+-f  //this is to give script file name with path
+-u   //This is for giving number of users. It is will number of users per sec. If it is 5, it will call 5 users
+-r   //number of per sec. if we give 2 as -r, then it will use above users in give -r. We can use -r 1. So that it will take above users in 1 sec
+-t   //total time of performance test.Here s meaning sec, m meaning minutes, h mearing hours. Eg: 10s - 10 sec, 1h - 1 hour, 2m - 2 mins
+--headless   //To run without opening locust webUI
+--print-stats   //To print stats result in terminal
+--csv   //To store result in csv file. Give file name Eg: --csv result.csv
+--csv-full-history   //To store full csv result in csv file
+--host       //To give host name
+
+
+Eg:
+locust -f tutorial8samplescriptforcheckingthecommand.py -u 6 -r 1 -t 10s --headless --print-stats --csv result.csv --csv-full-history --host=https://reqres.in
+
+
+//This will run and generate 4 csv files. files for exceptions, failures, stats and stats history
+
+
+Used below sample file:
+
+from locust import HttpUser, task, constant
+
+
+class MyHttpUser(HttpUser):
+    wait_time = constant(1)
+
+    @task
+    def my_api(self):
+        res = self.client.get('/api/users?page=2')
+        print('Called the api. response is:', res.status_code)
+
+------
+
+
 
 -------------
 
