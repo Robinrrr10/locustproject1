@@ -322,11 +322,52 @@ class MyHttpUser(HttpUser):
     wait_time = constant(1)
 
 
+
+---------------
+
+
+Tutorial 6: Sequential Task Set
+-------------------------------
+
+SequentialTaskSet
+This is simular to TaskSet. But SequentialTaskSet will run each task one by one. It will run each task in sequence
+
+Example:
+from locust import SequentialTaskSet, constant, task, HttpUser
+
+
+class MySequentialTask(SequentialTaskSet):
+
+    @task
+    def api_one(self):
+        self.client.get('/api/users?page=2')
+        print('First api')
+
+    @task
+    def api_second(self):
+        self.client.get('/api/users/5')
+        print('Second api')
+
+
+class MyHttpUser(HttpUser):
+    host = "https://reqres.in"
+    tasks = [MySequentialTask]
+    wait_time = constant(1)
+
+
+
+
 -------------
 
 To run in UI:
 -------
 --------
+
+Go to virtual env first using below command
+
+.\venv\Scripts\activate.bat
+
+
 
 To launch use below command.
 
