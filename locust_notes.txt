@@ -452,7 +452,7 @@ locust -f tutorial8samplescriptforcheckingthecommand.py -u 6 -r 1 -t 10s --headl
 
 
 //This will run and generate 4 csv files. files for exceptions, failures, stats and stats history
-
+//We can use sample command for running in CICD also
 
 Used below sample file:
 
@@ -467,8 +467,54 @@ class MyHttpUser(HttpUser):
         res = self.client.get('/api/users?page=2')
         print('Called the api. response is:', res.status_code)
 
-------
+---------
 
+Tutorial 8: Command line option part 2:
+--------------------------------------
+
+-L DEBUG --logfile filename.logs    //This is storing load test log files. we can give log level. We can give any of the them in DEBUG/INFO/WARNING/ERROR/CRITICAL
+
+--html htmlfoldername.html
+
+locust -f script.py -u 10 -r 2 -t 10s --headless --print-stats --csv result.csv --csv-full-history --host=http://hostname.com -L DEBUG --logfile filename.logs --html htmlfoldername
+
+
+locust -f script.py -l   //This will list all users classes
+
+locust -f script.py --show-task-ratio    //This will show task execution ratio. Show how the load will be splited if we run.
+
+locust -f script.py --show-task-ratio-json    //This will show task execution ratio in json format. Show how the load will be splited if we run. It will show above in json format
+
+
+
+Sample file:
+from locust import HttpUser, task, constant
+
+class MyHttpUsers(HttpUser):
+    host = "https://reqres.in"
+    wait_time = constant(1)
+
+    @task
+    def get_users(self):
+        self.client.get('/api/users?page=2')
+
+    @task
+    def create_user(self):
+        self.client.post('/api/users', data='''{ "name": "morpheus", "job": "leader" }''')
+
+
+
+
+
+Commands:
+
+locust -f tutorial9commandsWithLogsAndHtmletc.py -l
+
+locust -f tutorial9commandsWithLogsAndHtmletc.py --show-task-ratio
+
+locust -f tutorial9commandsWithLogsAndHtmletc.py --show-task-ratio-json 
+
+locust -f tutorial9commandsWithLogsAndHtmletc.py -u 2 -r 3 -t 20s --headless --print-stats --host=https://reqres.in -L DEBUG --logfile test.log --html uireport.html
 
 
 -------------
