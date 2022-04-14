@@ -911,6 +911,65 @@ class PetStorPerf(HttpUser):
     wait_time = constant(1)
 
 
+----------
+
+Tutorial 15: Logging
+--------------------
+Logging helps more for debugging
+locust uses python logging framework
+
+We can import logging like below
+import logging
+
+Below are the different levels of logging
+logging.info("message to log")
+logging.error("message to log")
+logging.critical("message to log")
+logging.debug("message to log")
+logging.warning("message to log")
+
+We can use below sub command regarding logging
+
+--skip-log-setup          //This will skip the logging
+--logfile mylog.log        //This is to create log file and to store logs in this file  //It can create new file if file is not available //But if we give filname along with directory, then directory should exits. it wont create directory. 
+--loglevel DEBUG     //This is to give log level. We can give DEBUG or INFO or WARNING or ERROR or CRITICAL     
+
+DEBUG includes all logs, INFO will print only infor logs. Others will be based on it level and include the order based on level
+
+
+Example: file name tutorial15logging.py 
+
+from locust import HttpUser, task, constant, TaskSet
+import logging    #importing python inbuild logging
+
+class MyTaskSet(TaskSet):
+
+    @task
+    def get_users(self):
+        with self.client.get('/api/users?page=2', catch_response = True, name = 'page api') as response:
+            logging.info('Response is: ' + response.text)   #way to add logs. we will give info or debug etc
+            if response.elapsed.total_seconds() < 2:
+                logging.debug('Response code is: ' + str(response.status_code))
+                logging.debug('Response time is: ' + str(response.elapsed.total_seconds()))
+                response.success()
+            else:
+                logging.debug('Response code is: ' + str(response.status_code))
+                logging.debug('Response time is: ' + str(response.elapsed.total_seconds()))
+                response.failure('Response takes more than 2 sec')
+
+
+class MyHttpUsers(HttpUser):
+    host = "https://reqres.in"
+    tasks = [MyTaskSet]
+    wait_time = constant(1)
+
+
+command:
+
+locust -f tutorial15logging.py -u 1 -r 1 -t 10s --headless --logfile logs\test.log --loglevel DEBUG --only-summary
+
+
+
 
 -------------
 
