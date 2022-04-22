@@ -968,6 +968,118 @@ command:
 
 locust -f tutorial15logging.py -u 1 -r 1 -t 10s --headless --logfile logs\test.log --loglevel DEBUG --only-summary
 
+------------------------------------------------------
+
+
+Tutorial 16: Locust configuration
+-------------------------------
+
+
+We can pass the configuration values in commandline. Eg: --host, -u, -r
+locust -h will show all commands
+
+
+In below link we can see documentation about configuration of environment and command line
+https://docs.locust.io/en/latest/configuration.html#environment-variables
+
+
+
+Below are few environment variable where locust will look for while running the test.  
+LOCUST_HOST
+LOCUST_USERS
+LOCUST_SPAWN_RATE
+LOCUST_HEADLESS
+LOCUST_TAGS
+LOCUST_MODE_MASTER
+LOCUST_MODE_WORKER
+etc..
+
+Configuration file should be stored in below extension
+filename.conf
+or
+filename.yaml
+
+Eg: Sample locust.conf file
+
+[runtime settings]
+
+host = http://example.com
+users = 2
+spawn-rate = 1
+run-time = 5s
+headless = true
+only-summary = true
+
+
+Eg: Sample locust.yaml file
+
+---
+# Runtime Settings
+
+host: https://google.com
+users: 2
+spawn-rate: 1
+run-time: 5s
+headless: true
+only-summary: true
+
+
+Regarding config priority,
+First command line value has higher priority,
+Then environment variable
+then --config file                    //Eg: locust -f script.py --config givefilenamewithpath.py
+then config file(./locust.conf) in root directory. Should have same name locust.conf
+Then config file(~/locust.conf) in user home directory. should have same naume locust.conf
+
+
+----------------------------------------
+
+Tutorial 17: Events and Eventhook
+---------------------------------
+Events:                                                //This is simular to java testng listener
+Events is used to some thing to do during below
+Before started if want to clean data or if wanted to create test data
+During test if request fails what to do next
+After request pass, what to do nex
+After the test is done, about to shutdown, what to do next
+
+
+Events: We can use below events
+test_start
+test_stop
+on_locust_init
+request_failure
+request_success
+reset_stats
+user_error
+report_to_master
+etc...
+
+To fire the event, use like below
+from locust import events
+use the decorator. // Just like adding @events
+Eg @events.spawning_complete.add_listener   //Here we are giving type of the event and action. In this case spawning_complete is the type and add_listener is action
+Recommanded to use **kwargs
+
+Eg:
+
+@events.spawning_complete.add_listener
+def spawn_users(user_count, **kwargs):
+	print("Spawned...", user_count, " users.")
+
+
+
+EventHook:
+This is add our own event using eventhook
+This is fire our own events
+reverse=False is default. If we give reverse=True, then this will fire events in the reverse order
+
+Eg:
+my_event = EventHook()
+	def on_my_event(a, b, **kw):   //minimum two parameter is mandatory. We should also give key word aruguments **kw
+		print("Event was fired with arguments : %s, %s" % (a, b))
+	my_event.add_listener(on_my_event)
+	my_event.fire(a="foo", b="bar")
 
 
 
@@ -1008,7 +1120,6 @@ We can also click new test to again run the tes
 
 
 ---
-
 
 
 -----------------
