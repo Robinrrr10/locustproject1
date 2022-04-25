@@ -3,6 +3,7 @@ from locust import events
 
 import logging
 
+
 @events.spawning_complete.add_listener
 def spawn_users(user_count, **kwargs):
     print("Spawned users...", user_count, " users.")

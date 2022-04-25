@@ -1081,6 +1081,94 @@ my_event = EventHook()
 	my_event.add_listener(on_my_event)
 	my_event.fire(a="foo", b="bar")
 
+--------------------
+
+Tutorial 18: Distributed load testing
+-------------------------------------
+We cannot generate more  load due to limitation in CPU, Memory, Network etc.
+To generate more load, we need more machine connected together and run the load testing.
+We can have multiple machines and generate more load.
+
+Here we can have one master who will talk to workers.
+We can have multiple workers who will call the api and generate the load.
+
+Master setup can be  done with below file
+Eg: master.conf
+[master conf]
+master = true                      //Only if it true, then master machine will assign himself as master
+expect-workers = 2                 //Expected number of workers. Unless all workers are up, it wont start the script
+
+[runtime settings]
+host = https://petstore.octoperf.com
+users = 3
+spawn-rate = 1
+locustfile = myfolder\petstore.py
+run-time = 60s
+headless = true
+only-summary = true
+
+
+
+ //If we wanted to run in UI, remove run-time, headless, only-summary fields in above
+
+
+
+
+
+worker setup can be done using  below
+
+Eg: worker.conf
+[worker conf]
+worker = true                           //It should be true, then only it will act as worker
+locustfile = myfolder\petstore.py
+master-host = xxx.xxx.xxx.xxx            //Give ip address. If you are running in local, give localhost
+
+
+
+Repo should be available in master and worker machines
+
+Go to  master machine
+First we should run master using below command
+locust --config folderpath/master.conf
+
+Then it will run as master and wait for worker to join
+
+
+Then go to worker machine and run below command
+locust --config folderpath/worker.conf
+
+Then worker will automatically join the master.
+Once expected workers are up, it will automatically run the script
+And the result will be shown on worker
+
+When running on UI mode, we can give master ip and port in chrome to open the web UI of locust,
+We can see the tab workers, There we can see how many workers are there and the status, cpu usage, memory usage etc
+
+
+Important:
+Locust script/repo should presend in both master and worker machines
+number_of_users > number_user_classes * number_of_workers  //Number of users should be always greater than product of user classes and workers
+
+
+Note:
+To just to this, we can open two/three different terminal and we can go to venv\Scripts\activate
+And then we can run and check
+
+In terminal 1:
+venv\Scripts\activate
+locust --config distributedLoadTesting\master.conf
+
+In terminal 2:
+venv\Scripts\activate
+locust --config distributedLoadTesting\worker.conf
+
+In terminal 3:
+venv\Scripts\activate
+locust --config distributedLoadTesting\worker.conf
+
+------------------------------------------------------------------
+
+
 
 
 -------------
