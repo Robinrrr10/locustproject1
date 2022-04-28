@@ -1166,6 +1166,59 @@ In terminal 3:
 venv\Scripts\activate
 locust --config distributedLoadTesting\worker.conf
 
+
+------------------------------------------------------
+
+Tutorial 19: Locust in docker
+-----------------------------
+
+Below is to create the docker container and to run the locust :
+
+
+Go to path where the locust script is there. Eg: locustscript.py
+
+
+Now use below command to run the locustscript in docker
+
+docker run -p 8089:8089 -v $PWD:/mnt/locust -d locustio/locust -f /mnt/locust/locustscript.py
+
+//Here the image is locustio/locust  // locustio/locust
+//It will run the locust web ui in 8089   //-p 8089:8089
+//It will mount current directory with given pat.  //-v $PWD:/mnt/locust  //This will map current directory with containers directory
+//then the script file to run  //locustio/locust -f /mnt/locust/locustscript.py
+
+
+
+
+Below is to run the locust in headless mode:
+
+docker run -v $PWD:/mnt/locust locustio/locust -f /mnt/locust/locustscript.py --html /mnt/locust/report.html --headless --only-summary -r 1 -u 1 -t 10s
+
+
+//Here the image is locustio/locust  // locustio/locust
+//It will mount current directory with given pat.  //-v $PWD:/mnt/locust  //This will map current directory with containers directory
+//To run the locust in headless mode and to generate html report:     //locustio/locust -f /mnt/locust/locustscript.py --html /mnt/locust/report.html --headless --only-summary -r 1 -u 1 -t 10s
+
+
+
+docker ps   //To check the running container
+
+docker exec -it containerId /bin/bash  //To login to container
+
+
+--------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
 ------------------------------------------------------------------
 
 
