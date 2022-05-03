@@ -1183,11 +1183,11 @@ Now use below command to run the locustscript in docker
 docker run -p 8089:8089 -v $PWD:/mnt/locust -d locustio/locust -f /mnt/locust/locustscript.py
 
 //Here the image is locustio/locust  // locustio/locust
-//It will run the locust web ui in 8089   //-p 8089:8089
+//It will run the locust web ui in 8089   //-p 8089:8089   //We should open 
 //It will mount current directory with given pat.  //-v $PWD:/mnt/locust  //This will map current directory with containers directory
 //then the script file to run  //locustio/locust -f /mnt/locust/locustscript.py
 
-
+It will run the locust web ui in port 8089  Give http://ipaddress:8089   
 
 
 Below is to run the locust in headless mode:
@@ -1198,7 +1198,7 @@ docker run -v $PWD:/mnt/locust locustio/locust -f /mnt/locust/locustscript.py --
 //Here the image is locustio/locust  // locustio/locust
 //It will mount current directory with given pat.  //-v $PWD:/mnt/locust  //This will map current directory with containers directory
 //To run the locust in headless mode and to generate html report:     //locustio/locust -f /mnt/locust/locustscript.py --html /mnt/locust/report.html --headless --only-summary -r 1 -u 1 -t 10s
-
+//we might face error when generating html report
 
 
 docker ps   //To check the running container
@@ -1208,16 +1208,59 @@ docker exec -it containerId /bin/bash  //To login to container
 
 --------------------------------------------------------------------
 
+Tutorial 20: Distributed load testing in docker
+----------------------------------------------
+Here we will use docker compose to achive distributed load 
+
+Create docker-compose.yaml file with below like content
+
+Eg:
+version: '3'
+
+services: 
+   master:
+      image: locustio/locust
+      ports:
+       - "8089:8089"
+      volumes:
+       -./:/mnt/locust
+      command: -f /mnt/locust/locustscriptfile.py --master --expect-workers 2
+
+   worker1:
+      image: locustio/locust
+      volumes:
+       - ./:/mnt/locust
+      command: -f /mnt/locust/locustscriptfile.py --worker --master-host master
+      #command: -f /mnt/locust/locustscriptfile.py --master --expect-workers 2 --headless --only-summary -u 2 -r 1 -t 30s --html /mnt/locust/myresult.html  //This is to run in headless mode
+
+   worker2:
+      image: locustio/locust
+      volumes:
+       - ./:/mnt/locust
+      command: -f /mnt/locust/locustscriptfile.py --worker --master-host master
 
 
+To run give below command
+docker-compose up
+
+Now we can open the locust web ui in browser in using url https://ipaddress:8089  //Give master ip address. Also we should open the port 8089 if it is not opened
+
+To stop the we can press ctrl+c to stop and terminate
+
+To delete contrainers created by docker compose, use below command
+docker-/compose rm
+
+To run in headless we can modify command under maste like below. 
+command: -f /mnt/locust/locustscriptfile.py --master --expect-workers 2 --headless --only-summary -u 2 -r 1 -t 30s --html /mnt/locust/myresult.html
+//--headless is to run the script in headless mode
+//-u number of users
+//-r rate of frequency
+//-t total duration
+//--html filepathtogeneratehtmlresult.html   //This is to generate html report
 
 
-
-
-
-
-
-
+It will run in headless mode, and it will generate html report file
+We can check the report file post running is completed
 
 ------------------------------------------------------------------
 
@@ -1258,6 +1301,16 @@ Download data - here we can download the result in csv file
 
 We can stop by clicking stop button in statistics
 We can also click new test to again run the tes 
+
+
+Notes:
+-----
+We might face permission denied error when generating html report file when running in docker. If we use mount volume we might face
+In that case we can avoid using entire path of volume to generate html. This is because it will run locust with  user name locust. But the volume mount is in root.
+We can just give html file name. It will generate html report inside docker container in home/locust.
+Then we can move the report from container to  host machine
+
+
 
 
 ---
