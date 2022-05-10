@@ -1027,9 +1027,9 @@ only-summary: true
 Regarding config priority,
 First command line value has higher priority,
 Then environment variable
-then --config file                    //Eg: locust -f script.py --config givefilenamewithpath.py
+then --config file                    //Eg: locust -f script.py --config givefilenamewithpath.conf
 then config file(./locust.conf) in root directory. Should have same name locust.conf
-Then config file(~/locust.conf) in user home directory. should have same naume locust.conf
+Then config file(~/locust.conf) in current directory. should have same naume locust.conf
 
 
 ----------------------------------------
