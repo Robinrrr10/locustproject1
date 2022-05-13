@@ -1225,13 +1225,13 @@ services:
       volumes:
        -./:/mnt/locust
       command: -f /mnt/locust/locustscriptfile.py --master --expect-workers 2
+      #command: -f /mnt/locust/locustscriptfile.py --master --expect-workers 2 --headless --only-summary -u 2 -r 1 -t 30s --html /mnt/locust/myresult.html  //This is to run in headless mode
 
    worker1:
       image: locustio/locust
       volumes:
        - ./:/mnt/locust
       command: -f /mnt/locust/locustscriptfile.py --worker --master-host master
-      #command: -f /mnt/locust/locustscriptfile.py --master --expect-workers 2 --headless --only-summary -u 2 -r 1 -t 30s --html /mnt/locust/myresult.html  //This is to run in headless mode
 
    worker2:
       image: locustio/locust
